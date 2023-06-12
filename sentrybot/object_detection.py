@@ -5,6 +5,7 @@ from matplotlib.image import AxesImage
 from matplotlib.colors import rgb2hex
 import pandas as pd
 from PIL import ImageDraw, ImageFont
+from IPython.display import display
 
 # Import the transformers model
 from transformers import YolosImageProcessor, YolosForObjectDetection
