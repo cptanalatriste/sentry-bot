@@ -30,12 +30,13 @@ def main(minimum_hue, maximum_hue):
     current_center_y = 0
     current_width = 0
     current_height = 0
+    current_contour = None
 
     while True:
         _, frame = video_capture.read()
 
         # TODO: Check effectiveness of this.
-        frame = cv2.blur(frame, (3, 3))
+        # frame = cv2.blur(frame, (3, 3))
 
         hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
@@ -63,22 +64,26 @@ def main(minimum_hue, maximum_hue):
                 current_position_x = position_x
                 current_position_y = position_y
 
+                current_contour = contour
+
         if (
             current_max_area > MINIMUM_TARGET_AREA
             and current_max_area < MAXIMUM_TARGET_AREA
         ):
             for index, image in enumerate([frame, hsv_frame, colour_mask]):
-                cv2.rectangle(
-                    image,
-                    (
-                        current_position_x,
-                        current_position_y,
-                        current_position_x + current_width,
-                        current_position_y + current_height,
-                    ),
-                    (255, 0, 0),
-                    3,
-                )
+                # cv2.rectangle(
+                #     image,
+                #     (
+                #         current_position_x,
+                #         current_position_y,
+                #         current_position_x + current_width,
+                #         current_position_y + current_height,
+                #     ),
+                #     (255, 0, 0),
+                #     3,
+                # )
+
+                cv2.drawContours(image, [current_contour], 0, (0, 255, 0), 3)
 
                 cv2.imshow(f"image_{index}", image)
 
