@@ -15,6 +15,18 @@ def draw_contour(image, current_contour):
     cv2.drawContours(image, [current_contour], 0, (0, 255, 0), 3)
 
 
+def contour_to_rectangle(contour):
+    polygonal_curve = cv2.approxPolyDP(contour, 3, True)
+    bounding_rectangle = cv2.boundingRect(polygonal_curve)
+
+    return (
+        bounding_rectangle[0],
+        bounding_rectangle[1],
+        bounding_rectangle[2],
+        bounding_rectangle[3],
+    )
+
+
 def draw_rectangle(
     image, current_position_x, current_position_y, current_width, current_height
 ):
@@ -91,12 +103,18 @@ def main(minimum_hue, maximum_hue):
             and current_max_area < MAXIMUM_TARGET_AREA
         ):
             for index, image in enumerate([frame, hsv_frame, colour_mask]):
+                (
+                    contour_x,
+                    contour_y,
+                    contour_width,
+                    contour_height,
+                ) = contour_to_rectangle(current_contour)
                 draw_rectangle(
                     image,
-                    current_position_x,
-                    current_position_y,
-                    current_width,
-                    current_height,
+                    contour_x,
+                    contour_y,
+                    contour_width,
+                    contour_height,
                 )
 
                 cv2.imshow(f"image_{index}", image)
