@@ -1,44 +1,68 @@
-# import the necessary packages
-import time
-
-import cv2
 import numpy as np
+import cv2
+
+cap = cv2.VideoCapture(0)
 
 
-# initialize the camera and grab a reference to the raw camera capture
-camera = cv2.VideoCapture(0)
+def nothing(x):
+    pass
+
+
+cv2.namedWindow("image", cv2.WINDOW_NORMAL)
+cv2.resizeWindow("image", (600, 200))
+cv2.createTrackbar("minH", "image", 0, 255, nothing)
+cv2.createTrackbar("minS", "image", 0, 255, nothing)
+cv2.createTrackbar("minV", "image", 0, 255, nothing)
+cv2.createTrackbar("maxH", "image", 0, 255, nothing)
+cv2.createTrackbar("maxS", "image", 0, 255, nothing)
+cv2.createTrackbar("maxV", "image", 0, 255, nothing)
 
 while True:
-    while True:
-        try:
-            hue_value = int(input("Hue value between 10 and 245: "))
-            if (hue_value < 10) or (hue_value > 245):
-                raise ValueError
-        except ValueError:
-            print("That isn't an integer between 10 and 245, try again")
-        else:
-            break
+    _, frame = cap.read()
+    hsv = cv2.cvtColor(
+        frame, cv2.COLOR_BGR2HSV
+    )  # convert to hsv encoding for better processing
 
-    lower_red = np.array([hue_value - 10, 100, 100])
-    upper_red = np.array([hue_value + 10, 255, 255])
+    minH = cv2.getTrackbarPos("minH", "image")
+    minS = cv2.getTrackbarPos("minS", "image")
+    minV = cv2.getTrackbarPos("minV", "image")
+    maxH = cv2.getTrackbarPos("maxH", "image")
+    maxS = cv2.getTrackbarPos("maxS", "image")
+    maxV = cv2.getTrackbarPos("maxV", "image")
 
-    while True:
-        ret, image = camera.read()
+    a = cv2.waitKey(5) & 0xFF
+    if a == ord("p"):
+        print(
+            "minH: ",
+            minH,
+            "\nmaxH: ",
+            maxH,
+            "\nminS : ",
+            minS,
+            "\nmaxS : ",
+            maxS,
+            "\nminV : ",
+            minV,
+            "\nmaxV : ",
+            maxV,
+        )
+    lowerpink = np.array([minH, minS, minV])
+    upperpink = np.array([maxH, maxS, maxV])
+    # print(lowerpink + '\n' + upperpink)
 
-        hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    mask = cv2.inRange(hsv, lowerpink, upperpink)
+    res = cv2.bitwise_and(frame, frame, mask=mask)
 
-        color_mask = cv2.inRange(hsv, lower_red, upper_red)
+    # median = cv2.bilateralFilter(res,15,75,75)
 
-        result = cv2.bitwise_and(image, image, mask=color_mask)
+    # cv2.imshow('median',descale(median,3))
+    cv2.imshow("frame", frame)
+    cv2.imshow("mask", mask)
+    cv2.imshow("res", res)
 
-        cv2.imshow("Camera Output", image)
-        cv2.imshow("HSV", hsv)
-        cv2.imshow("Color Mask", color_mask)
-        cv2.imshow("Final Result", result)
+    k = cv2.waitKey(5) & 0xFF
+    if k == 27:
+        break
 
-        k = cv2.waitKey(5)  # & 0xFF
-        if "q" == chr(k & 255):
-            break
-
-    camera.release()
-    cv2.destroyAllWindows()
+cv2.destroyAllWindows()
+cap.release()
