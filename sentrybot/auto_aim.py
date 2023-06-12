@@ -63,17 +63,21 @@ def main(minimum_hue, maximum_hue):
             current_max_area > MINIMUM_TARGET_AREA
             and current_max_area < MAXIMUM_TARGET_AREA
         ):
-            cv2.rectangle(
-                frame,
-                (
-                    current_position_x,
-                    current_position_y,
-                    current_position_x + current_width,
-                    current_position_y + current_height,
-                ),
-                (255, 0, 0),
-                3,
-            )
+            for index, image in enumerate([frame, hsv_frame, colour_mask]):
+                cv2.rectangle(
+                    image,
+                    (
+                        current_position_x,
+                        current_position_y,
+                        current_position_x + current_width,
+                        current_position_y + current_height,
+                    ),
+                    (255, 0, 0),
+                    3,
+                )
+
+                cv2.imshow(f"image_{index}", image)
+
             print(f"{current_position_x=}")
             print(f"{current_position_y=}")
             print(f"{current_center_x=}")
@@ -85,7 +89,6 @@ def main(minimum_hue, maximum_hue):
             else:
                 print("Object at the center")
 
-            cv2.imshow("image", frame)
             key = cv2.waitKey(0)
             cv2.destroyAllWindows()
             if key == ord("x"):
