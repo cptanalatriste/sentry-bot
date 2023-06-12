@@ -18,8 +18,12 @@ def main(minimum_hue, maximum_hue):
     image_center_y = image_height / 2
 
     current_max_area = 0
+    current_position_x = 0
+    current_position_y = 0
     current_center_x = 0
     current_center_y = 0
+    current_width = 0
+    current_height = 0
 
     while True:
         _, frame = video_capture.read()
@@ -43,14 +47,30 @@ def main(minimum_hue, maximum_hue):
                 current_max_area = area
                 current_center_x = center_x
                 current_center_y = center_y
+                current_width = width
+                current_height = height
+
+                current_position_x = position_x
+                current_position_y = position_y
 
         if (
             current_max_area > MINIMUM_TARGET_AREA
             and current_max_area < MAXIMUM_TARGET_AREA
         ):
-            print(f"{current_max_area=}")
+            cv2.rectangle(
+                frame,
+                (
+                    current_position_x,
+                    current_position_y,
+                    current_position_x + current_width,
+                    current_position_y + current_height,
+                ),
+                (255, 0, 0),
+                3,
+            )
+            print(f"{current_position_x=}")
+            print(f"{current_position_y=}")
             print(f"{current_center_x=}")
-            print(f"{current_center_y=}")
 
             if current_center_x > (image_center_x + image_width / 3):
                 print("Object right")
@@ -58,6 +78,12 @@ def main(minimum_hue, maximum_hue):
                 print("Object left")
             else:
                 print("Object at the center")
+
+            cv2.imshow("image", frame)
+            key = cv2.waitKey(0)
+            cv2.destroyAllWindows()
+            if key == ord("x"):
+                break
 
 
 if __name__ == "__main__":
