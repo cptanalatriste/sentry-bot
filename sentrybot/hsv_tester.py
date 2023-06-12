@@ -3,14 +3,10 @@ import time
 
 import cv2
 import numpy as np
-from picamera import PiCamera
-from picamera.array import PiRGBArray
+
 
 # initialize the camera and grab a reference to the raw camera capture
-camera = PiCamera()
-camera.resolution = (640, 480)
-camera.framerate = 32
-rawCapture = PiRGBArray(camera, size=(640, 480))
+camera = cv2.VideoCapture(0)
 
 while True:
     while True:
@@ -26,10 +22,8 @@ while True:
     lower_red = np.array([hue_value - 10, 100, 100])
     upper_red = np.array([hue_value + 10, 255, 255])
 
-    for frame in camera.capture_continuous(
-        rawCapture, format="bgr", use_video_port=True
-    ):
-        image = frame.array
+    while True:
+        ret, image = camera.read()
 
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
@@ -42,8 +36,9 @@ while True:
         cv2.imshow("Color Mask", color_mask)
         cv2.imshow("Final Result", result)
 
-        rawCapture.truncate(0)
-
         k = cv2.waitKey(5)  # & 0xFF
         if "q" == chr(k & 255):
             break
+
+    camera.release()
+    cv2.destroyAllWindows()
