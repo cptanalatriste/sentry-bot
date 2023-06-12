@@ -9,6 +9,8 @@ def main(minimum_hue, maximum_hue):
     video_capture = cv2.VideoCapture(0)  # Change to PiCamera for SentryBot
 
     current_max_area = 0
+    current_center_x = 0
+    current_center_y = 0
 
     while True:
         _, frame = video_capture.read()
@@ -29,12 +31,17 @@ def main(minimum_hue, maximum_hue):
             center_y = position_y + height / 2
 
             if area > current_max_area:
-                print(f"{area=}")
-                print(f"{center_x=}")
-                print(f"{center_y=}")
-
                 current_max_area = area
+                current_center_x = center_x
+                current_center_y = center_y
+
+        if current_max_area > 0:
+            print(f"{current_max_area=}")
+            print(f"{current_center_x=}")
+            print(f"{current_center_y=}")
 
 
 if __name__ == "__main__":
-    main(20, 49)
+    main(30, 50)
+
+# Between 50K and 70K
