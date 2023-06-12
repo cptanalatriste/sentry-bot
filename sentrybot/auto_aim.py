@@ -4,9 +4,18 @@ import numpy as np
 MINIMUM_RANGE = 0
 MAXIMUM_RANGE = 255
 
+MINIMUM_TARGET_AREA = 50000
+MAXIMUM_TARGET_AREA = 60000
+
 
 def main(minimum_hue, maximum_hue):
-    video_capture = cv2.VideoCapture(0)  # Change to PiCamera for SentryBot
+    # Change to PiCamera for SentryBot
+    video_capture = cv2.VideoCapture(0)
+    image_width = video_capture.get(cv2.CAP_PROP_FRAME_WIDTH)
+    image_height = video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT)
+
+    image_center_x = image_width / 2
+    image_center_y = image_height / 2
 
     current_max_area = 0
     current_center_x = 0
@@ -35,13 +44,23 @@ def main(minimum_hue, maximum_hue):
                 current_center_x = center_x
                 current_center_y = center_y
 
-        if current_max_area > 0:
+        if (
+            current_max_area > MINIMUM_TARGET_AREA
+            and current_max_area < MAXIMUM_TARGET_AREA
+        ):
             print(f"{current_max_area=}")
             print(f"{current_center_x=}")
             print(f"{current_center_y=}")
+
+            if current_center_x > (image_center_x + image_width / 3):
+                print("Object right")
+            elif current_center_x < (image_center_x - image_width / 3):
+                print("Object left")
+            else:
+                print("Object at the center")
 
 
 if __name__ == "__main__":
     main(30, 50)
 
-# Between 50K and 70K
+# Between 50K and 60K
