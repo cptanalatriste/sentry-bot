@@ -33,6 +33,10 @@ def main(minimum_hue, maximum_hue):
 
     while True:
         _, frame = video_capture.read()
+
+        # TODO: Check effectiveness of this.
+        frame = cv2.blur(frame, (3, 3))
+
         hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
         lower_bound = np.array([minimum_hue, MINIMUM_RANGE, MAXIMUM_RANGE])
