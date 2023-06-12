@@ -14,6 +14,9 @@ MAXIMUM_TARGET_AREA = 100000
 def main(minimum_hue, maximum_hue):
     # Change to PiCamera for SentryBot
     video_capture = cv2.VideoCapture(0)
+    cv2.namedWindow("image", cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("image", width=600, height=200)
+
     image_width = video_capture.get(cv2.CAP_PROP_FRAME_WIDTH)
     image_height = video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
