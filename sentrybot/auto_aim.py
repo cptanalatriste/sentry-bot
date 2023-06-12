@@ -116,6 +116,7 @@ def main(minimum_hue, maximum_hue):
                     contour_width,
                     contour_height,
                 )
+                draw_contour(image, current_contour)
 
                 cv2.imshow(f"image_{index}", image)
 
