@@ -11,6 +11,26 @@ MINIMUM_TARGET_AREA = 0
 MAXIMUM_TARGET_AREA = 100000
 
 
+def draw_contour(image, current_contour):
+    cv2.drawContours(image, [current_contour], 0, (0, 255, 0), 3)
+
+
+def draw_rectangle(
+    image, current_position_x, current_position_y, current_width, current_height
+):
+    cv2.rectangle(
+        image,
+        (
+            current_position_x,
+            current_position_y,
+            current_position_x + current_width,
+            current_position_y + current_height,
+        ),
+        (255, 0, 0),
+        3,
+    )
+
+
 def main(minimum_hue, maximum_hue):
     # Change to PiCamera for SentryBot
     video_capture = cv2.VideoCapture(0)
@@ -71,19 +91,13 @@ def main(minimum_hue, maximum_hue):
             and current_max_area < MAXIMUM_TARGET_AREA
         ):
             for index, image in enumerate([frame, hsv_frame, colour_mask]):
-                # cv2.rectangle(
-                #     image,
-                #     (
-                #         current_position_x,
-                #         current_position_y,
-                #         current_position_x + current_width,
-                #         current_position_y + current_height,
-                #     ),
-                #     (255, 0, 0),
-                #     3,
-                # )
-
-                cv2.drawContours(image, [current_contour], 0, (0, 255, 0), 3)
+                draw_rectangle(
+                    image,
+                    current_position_x,
+                    current_position_y,
+                    current_width,
+                    current_height,
+                )
 
                 cv2.imshow(f"image_{index}", image)
 
