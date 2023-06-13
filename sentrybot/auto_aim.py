@@ -39,29 +39,33 @@ def draw_rectangle(
     )
 
 
+def draw_contour_box(image, current_contour):
+    (
+        contour_x,
+        contour_y,
+        contour_width,
+        contour_height,
+    ) = contour_to_rectangle(current_contour)
+    draw_rectangle(
+        image,
+        contour_x,
+        contour_y,
+        contour_width,
+        contour_height,
+    )
+    draw_contour(image, current_contour)
+
+    print(f"{contour_x=}")
+    print(f"{contour_y=}")
+    print(f"{contour_width=}")
+    print(f"{contour_height=}")
+
+
 def diagnostic_plots(frame_list, current_contour):
     for index, image in enumerate(frame_list):
-        (
-            contour_x,
-            contour_y,
-            contour_width,
-            contour_height,
-        ) = contour_to_rectangle(current_contour)
-        draw_rectangle(
-            image,
-            contour_x,
-            contour_y,
-            contour_width,
-            contour_height,
-        )
-        draw_contour(image, current_contour)
+        draw_contour_box(image, current_contour)
 
         cv2.imshow(f"image_{index}", image)
-
-        print(f"{contour_x=}")
-        print(f"{contour_y=}")
-        print(f"{contour_width=}")
-        print(f"{contour_height=}")
 
     key = cv2.waitKey(0)
     cv2.destroyAllWindows()
@@ -134,7 +138,9 @@ def main(minimum_hue, maximum_hue):
             print(f"{current_center_x=}")
             print(f"{current_center_y=}")
             print(f"{current_max_area=}")
+            print(f"{image_width=}")
 
+            draw_contour(frame, current_contour)
 
             if current_center_x > (image_center_x + image_width / 3):
                 print("Object right")
@@ -142,6 +148,10 @@ def main(minimum_hue, maximum_hue):
                 print("Object left")
             else:
                 print("Object at the center")
+
+        cv2.imshow("Auto-aiming", frame)
+        if cv2.waitKey(1) == 27:
+            break
 
 
 if __name__ == "__main__":
