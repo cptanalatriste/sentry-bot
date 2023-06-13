@@ -4,8 +4,8 @@ import numpy as np
 MINIMUM_RANGE = 0
 MAXIMUM_RANGE = 255
 
-MINIMUM_TARGET_AREA = 3000
-MAXIMUM_TARGET_AREA = 4000
+MINIMUM_TARGET_AREA = 0
+MAXIMUM_TARGET_AREA = 100000
 
 
 def draw_contour(image, current_contour):
