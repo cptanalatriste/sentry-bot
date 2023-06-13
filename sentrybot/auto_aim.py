@@ -39,6 +39,36 @@ def draw_rectangle(
     )
 
 
+def diagnostic_plots(frame_list, current_contour):
+    for index, image in enumerate(frame_list):
+        (
+            contour_x,
+            contour_y,
+            contour_width,
+            contour_height,
+        ) = contour_to_rectangle(current_contour)
+        draw_rectangle(
+            image,
+            contour_x,
+            contour_y,
+            contour_width,
+            contour_height,
+        )
+        draw_contour(image, current_contour)
+
+        cv2.imshow(f"image_{index}", image)
+
+        print(f"{contour_x=}")
+        print(f"{contour_y=}")
+        print(f"{contour_width=}")
+        print(f"{contour_height=}")
+
+    key = cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    if key == ord("x"):
+        return
+
+
 def main(minimum_hue, maximum_hue):
     # Change to PiCamera for SentryBot
     video_capture = cv2.VideoCapture(0)
@@ -47,6 +77,9 @@ def main(minimum_hue, maximum_hue):
 
     image_width = video_capture.get(cv2.CAP_PROP_FRAME_WIDTH)
     image_height = video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT)
+
+    print(f"{image_width=}")
+    print(f"{image_height=}")
 
     image_center_x = image_width / 2
     image_center_y = image_height / 2
@@ -77,7 +110,7 @@ def main(minimum_hue, maximum_hue):
         )
 
         for contour in contours:
-            position_x, position_y, width, height = cv2.boundingRect(contour)
+            position_x, position_y, width, height = contour_to_rectangle(contour)
             area = width * height
             center_x = position_x + width / 2
             center_y = position_y + height / 2
@@ -98,28 +131,10 @@ def main(minimum_hue, maximum_hue):
             current_max_area > MINIMUM_TARGET_AREA
             and current_max_area < MAXIMUM_TARGET_AREA
         ):
-            for index, image in enumerate([frame, colour_mask]):
-                (
-                    contour_x,
-                    contour_y,
-                    contour_width,
-                    contour_height,
-                ) = contour_to_rectangle(current_contour)
-                draw_rectangle(
-                    image,
-                    contour_x,
-                    contour_y,
-                    contour_width,
-                    contour_height,
-                )
-                draw_contour(image, current_contour)
+            print(f"{current_center_x=}")
+            print(f"{current_center_y=}")
+            print(f"{current_max_area=}")
 
-                cv2.imshow(f"image_{index}", image)
-
-                print(f"{contour_x=}")
-                print(f"{contour_y=}")
-                print(f"{contour_width=}")
-                print(f"{contour_height=}")
 
             if current_center_x > (image_center_x + image_width / 3):
                 print("Object right")
@@ -127,11 +142,6 @@ def main(minimum_hue, maximum_hue):
                 print("Object left")
             else:
                 print("Object at the center")
-
-            key = cv2.waitKey(0)
-            cv2.destroyAllWindows()
-            if key == ord("x"):
-                break
 
 
 if __name__ == "__main__":
