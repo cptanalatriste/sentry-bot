@@ -32,14 +32,10 @@ def draw_rectangle(
 ):
     cv2.rectangle(
         image,
-        (
-            current_position_x,
-            current_position_y,
-            current_position_x + current_width,
-            current_position_y + current_height,
-        ),
-        (255, 0, 0),
-        3,
+        pt1=(current_position_x, current_position_y),
+        pt2=(current_position_x + current_width, current_position_y + current_height),
+        color=(255, 0, 0),
+        thickness=3,
     )
 
 
