@@ -102,7 +102,7 @@ def main(minimum_hue, maximum_hue):
             current_max_area > MINIMUM_TARGET_AREA
             and current_max_area < MAXIMUM_TARGET_AREA
         ):
-            for index, image in enumerate([frame, hsv_frame, colour_mask]):
+            for index, image in enumerate([frame, colour_mask]):
                 (
                     contour_x,
                     contour_y,
@@ -120,9 +120,10 @@ def main(minimum_hue, maximum_hue):
 
                 cv2.imshow(f"image_{index}", image)
 
-            print(f"{current_position_x=}")
-            print(f"{current_position_y=}")
-            print(f"{current_center_x=}")
+                print(f"{contour_x=}")
+                print(f"{contour_y=}")
+                print(f"{contour_width=}")
+                print(f"{contour_height=}")
 
             if current_center_x > (image_center_x + image_width / 3):
                 print("Object right")
