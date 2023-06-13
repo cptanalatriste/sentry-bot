@@ -4,11 +4,8 @@ import numpy as np
 MINIMUM_RANGE = 0
 MAXIMUM_RANGE = 255
 
-# MINIMUM_TARGET_AREA = 50000
-# MAXIMUM_TARGET_AREA = 60000
-
-MINIMUM_TARGET_AREA = 0
-MAXIMUM_TARGET_AREA = 100000
+MINIMUM_TARGET_AREA = 3000
+MAXIMUM_TARGET_AREA = 4000
 
 
 def draw_contour(image, current_contour):
@@ -73,6 +70,35 @@ def diagnostic_plots(frame_list, current_contour):
         return
 
 
+def detect_target(contours):
+    current_max_area = 0
+    current_contour = None
+
+    for contour in contours:
+        _, _, width, height = contour_to_rectangle(contour)
+        area = width * height
+
+        if area > current_max_area:
+            current_max_area = area
+            current_contour = contour
+    if (
+        current_max_area > MINIMUM_TARGET_AREA
+        and current_max_area < MAXIMUM_TARGET_AREA
+    ):
+        return current_contour
+
+    return None
+
+
+def aim(current_center_x, image_center_x, image_width):
+    if current_center_x > (image_center_x + image_width / 3):
+        print("Object right")
+    elif current_center_x < (image_center_x - image_width / 3):
+        print("Object left")
+    else:
+        print("Object at the center")
+
+
 def main(minimum_hue, maximum_hue):
     # Change to PiCamera for SentryBot
     video_capture = cv2.VideoCapture(0)
@@ -87,15 +113,6 @@ def main(minimum_hue, maximum_hue):
 
     image_center_x = image_width / 2
     image_center_y = image_height / 2
-
-    current_max_area = 0
-    current_position_x = 0
-    current_position_y = 0
-    current_center_x = 0
-    current_center_y = 0
-    current_width = 0
-    current_height = 0
-    current_contour = None
 
     while True:
         _, frame = video_capture.read()
@@ -113,41 +130,23 @@ def main(minimum_hue, maximum_hue):
             colour_mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE
         )
 
-        for contour in contours:
-            position_x, position_y, width, height = contour_to_rectangle(contour)
-            area = width * height
-            center_x = position_x + width / 2
-            center_y = position_y + height / 2
+        contour_target = detect_target(contours)
+        if contour_target is None:
+            print("No target detected")
+        else:
+            draw_contour(frame, contour_target)
 
-            if area > current_max_area:
-                current_max_area = area
-                current_center_x = center_x
-                current_center_y = center_y
-                current_width = width
-                current_height = height
+            position_x, position_y, width, height = contour_to_rectangle(contour_target)
+            current_max_area = width * height
+            current_center_x = position_x + width / 2
+            current_center_y = position_y + height / 2
 
-                current_position_x = position_x
-                current_position_y = position_y
-
-                current_contour = contour
-
-        if (
-            current_max_area > MINIMUM_TARGET_AREA
-            and current_max_area < MAXIMUM_TARGET_AREA
-        ):
             print(f"{current_center_x=}")
             print(f"{current_center_y=}")
             print(f"{current_max_area=}")
             print(f"{image_width=}")
 
-            draw_contour(frame, current_contour)
-
-            if current_center_x > (image_center_x + image_width / 3):
-                print("Object right")
-            elif current_center_x < (image_center_x - image_width / 3):
-                print("Object left")
-            else:
-                print("Object at the center")
+            aim(current_center_x, image_center_x, image_width)
 
         cv2.imshow("Auto-aiming", frame)
         if cv2.waitKey(1) == 27:
